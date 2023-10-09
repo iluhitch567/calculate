@@ -20,6 +20,11 @@ func NewAPIClient(baseURL, apiKey string) *APIClient {
 	}
 }
 
+// SetAPIKey устанавливает API-ключ для клиента.
+func (c *APIClient) SetAPIKey(apiKey string) {
+	c.APIKey = apiKey
+}
+
 // GetUser делает запрос к API для получения информации о пользователе по идентификатору.
 func (c *APIClient) GetUser(userID int) (map[string]interface{}, error) {
 	url := fmt.Sprintf("%s/user/%d", c.BaseURL, userID)
@@ -29,7 +34,8 @@ func (c *APIClient) GetUser(userID int) (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	req.Header.Add("Authorization", "Bearer "+c.APIKey)
+	// Добавляем заголовок X-MPBX-API-AUTH-TOKEN с вашим API-ключом
+	req.Header.Add("X-MPBX-API-AUTH-TOKEN", c.APIKey)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
