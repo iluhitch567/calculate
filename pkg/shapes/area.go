@@ -1,4 +1,4 @@
-package shapes
+package calculate
 
 import "math"
 
