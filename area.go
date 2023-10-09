@@ -1,8 +1,8 @@
 package calculate
 
 import (
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"net/http"
 )
@@ -17,41 +17,51 @@ func GetCircleArea(radius float32) float32 {
 
 // APIClient представляет клиент для работы с API.
 type APIClient struct {
-	BaseURL string
+	BaseURL  string
+	APIToken string
 }
 
-// NewAPIClient создает новый экземпляр APIClient.
-func NewAPIClient(baseURL string) *APIClient {
+// NewAPIClient создает новый экземпляр APIClient с указанным URL и токеном.
+func NewAPIClient(baseURL, apiToken string) *APIClient {
 	return &APIClient{
-		BaseURL: baseURL,
+		BaseURL:  baseURL,
+		APIToken: apiToken,
 	}
 }
 
-func (c *APIClient) Get(endpoint string, authToken string) ([]byte, error) {
-	url := fmt.Sprintf("%s/%s", c.BaseURL, endpoint)
+// GetAllUsers выполняет запрос к API и выводит всех пользователей в формате JSON в консоль.
+func (c *APIClient) GetAllUsers() error {
+	url := fmt.Sprintf("%s/users", c.BaseURL)
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	req.Header.Add("X-MPBX-API-AUTH-TOKEN", authToken)
+	req.Header.Add("X-MPBX-API-AUTH-TOKEN", c.BaseURL) //  заголовок X-MPBX-API-AUTH-TOKEN
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("API request failed with status code %d", resp.StatusCode)
+		return fmt.Errorf("API request failed with status code %d", resp.StatusCode)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	var users []map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&users); err != nil {
+		return err
+	}
+
+	// Вывод пользователей в формате JSON в консоль
+	jsonUsers, err := json.Marshal(users)
 	if err != nil {
-		return nil, err
+		return err
 	}
+	fmt.Println(string(jsonUsers))
 
-	return body, nil
+	return nil
 }
