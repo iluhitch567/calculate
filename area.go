@@ -1,7 +1,10 @@
 package calculate
 
-import "math"
+func Add(a, b int) int {
+	return a + b
+}
 
-func GetCircleArea(radius float32) float32 {
-	return math.Pi * radius * radius
+// Subtract выполняет вычитание второго числа из первого и возвращает результат.
+func Subtract(a, b int) int {
+	return a - b
 }
