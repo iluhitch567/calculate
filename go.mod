@@ -1,3 +1,3 @@
-module github.com/iluhitch567/calculate.git
+module github.com/iluhitch567/calculate
 
 go 1.21.1
